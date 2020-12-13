@@ -1,3 +1,9 @@
+#![feature(lang_items, start)]
+#![no_std]
+
+use core::mem::zeroed;
+use core::ptr::null_mut;
+
 use winapi::ctypes::c_int;
 use winapi::shared::minwindef::{DWORD, LPARAM, WORD, WPARAM};
 use winapi::um::winuser;
@@ -6,7 +12,7 @@ const HOTKEY_VK: WORD = winuser::VK_F8 as WORD;
 const SIMULATE_VK: WORD = winuser::VK_LWIN as WORD;
 
 unsafe fn keyboard_input(vk: WORD, up: bool) -> winuser::INPUT {
-    let mut u: winuser::INPUT_u = std::mem::zeroed();
+    let mut u: winuser::INPUT_u = zeroed();
     *u.ki_mut() = winuser::KEYBDINPUT {
         wVk: vk,
         wScan: 0,
@@ -20,11 +26,12 @@ unsafe fn keyboard_input(vk: WORD, up: bool) -> winuser::INPUT {
     }
 }
 
-fn main() {
+#[start]
+fn start(_argc: isize, _argv: *const *const u8) -> isize {
     let hotkey_id: c_int = 1;
     unsafe {
-        winuser::RegisterHotKey(std::ptr::null_mut(), hotkey_id, 0 as u32, HOTKEY_VK.into());
-        let mut msg: winuser::MSG = std::mem::zeroed();
+        winuser::RegisterHotKey(null_mut(), hotkey_id, 0 as u32, HOTKEY_VK.into());
+        let mut msg: winuser::MSG = zeroed();
         let mut inputs = [
             keyboard_input(SIMULATE_VK, false),
             keyboard_input(SIMULATE_VK, true),
@@ -32,15 +39,14 @@ fn main() {
         loop {
             if winuser::GetMessageW(
                 &mut msg as winuser::LPMSG,
-                std::ptr::null_mut(),
+                null_mut(),
                 winuser::WM_HOTKEY,
                 winuser::WM_HOTKEY,
             ) <= 0
             {
                 break;
             }
-            println!("lparam {} wparam {}", msg.lParam, msg.wParam);
-            if msg.hwnd != std::ptr::null_mut()
+            if msg.hwnd != null_mut()
                 || msg.message != winuser::WM_HOTKEY
                 || msg.lParam != (HOTKEY_VK as LPARAM) << 16
                 || msg.wParam != hotkey_id as WPARAM
@@ -50,8 +56,17 @@ fn main() {
             winuser::SendInput(
                 inputs.len() as u32,
                 &mut inputs[0] as winuser::LPINPUT,
-                std::mem::size_of::<winuser::INPUT>() as i32,
+                core::mem::size_of::<winuser::INPUT>() as i32,
             );
         }
     }
+    0
+}
+
+#[lang = "eh_personality"]
+extern "C" fn eh_personality() {}
+
+#[panic_handler]
+fn panic_handler(_info: &core::panic::PanicInfo) -> ! {
+    loop {}
 }
