@@ -1,5 +1,6 @@
 #![feature(lang_items, start)]
 #![no_std]
+#![windows_subsystem = "windows"]
 
 use core::mem::zeroed;
 use core::ptr::null_mut;
