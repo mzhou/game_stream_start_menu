@@ -10,7 +10,10 @@ unsafe fn keyboard_input(wVk: WORD, up: bool) -> winuser::INPUT {
         time: 0,
         dwExtraInfo: winuser::GetMessageExtraInfo() as usize,
     };
-    winuser::INPUT{type_: winuser::INPUT_KEYBOARD, u}
+    winuser::INPUT {
+        type_: winuser::INPUT_KEYBOARD,
+        u,
+    }
 }
 
 fn main() {
@@ -34,8 +37,16 @@ fn main() {
                 winuser::WM_HOTKEY,
             );
             println!("got message");
-            winuser::SendInput(1, &mut inputs[0] as winuser::LPINPUT, std::mem::size_of::<winuser::INPUT>() as i32);
-            winuser::SendInput(1, &mut inputs[1] as winuser::LPINPUT, std::mem::size_of::<winuser::INPUT>() as i32);
+            winuser::SendInput(
+                1,
+                &mut inputs[0] as winuser::LPINPUT,
+                std::mem::size_of::<winuser::INPUT>() as i32,
+            );
+            winuser::SendInput(
+                1,
+                &mut inputs[1] as winuser::LPINPUT,
+                std::mem::size_of::<winuser::INPUT>() as i32,
+            );
         }
     }
 }
