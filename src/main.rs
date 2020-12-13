@@ -8,7 +8,7 @@ use winapi::ctypes::c_int;
 use winapi::shared::minwindef::{DWORD, LPARAM, WORD, WPARAM};
 use winapi::um::winuser;
 
-const HOTKEY_VK: WORD = winuser::VK_CAPITAL as WORD;
+const HOTKEY_VK: WORD = winuser::VK_F8 as WORD;
 const SIMULATE_VK: WORD = winuser::VK_LWIN as WORD;
 
 unsafe fn keyboard_input(vk: WORD, up: bool) -> winuser::INPUT {
